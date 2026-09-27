@@ -411,6 +411,7 @@ export class SelectPixelBannerModal extends Modal {
                 cls: 'pixel-banner-message-text'
             });
         }
+    }
 
     addStyle() {
         const style = document.createElement('style');

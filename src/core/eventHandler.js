@@ -305,6 +305,5 @@ export {
     handleLayoutChange,
     handleModeChange,
     handleSelectImage,
-    handleBannerIconClick,
-    handleOpenStore
+    handleBannerIconClick
 };
