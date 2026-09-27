@@ -1,5 +1,5 @@
 import { MarkdownView, Notice } from 'obsidian';
-import { ImageSelectionModal, SelectPixelBannerModal, PixelBannerStoreModal } from '../modal/modals.js';
+import { ImageSelectionModal, SelectPixelBannerModal } from '../modal/modals.js';
 import { getFrontmatterValue } from '../utils/frontmatterUtils.js';
 
 // Global debouncing map to prevent multiple rapid banner updates for the same file
@@ -298,10 +298,6 @@ async function handleSelectImage() {
 
 function handleBannerIconClick() {
     new SelectPixelBannerModal(this.app, this).open();
-}
-
-function handleOpenStore() {
-    new PixelBannerStoreModal(this.app, this).open();
 }
 
 export {

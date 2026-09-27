@@ -1,5 +1,4 @@
 import { Modal, Notice, Setting } from "obsidian";
-import { GenerateAIBannerModal } from './generateAIBannerModal.js'
 import { FolderSelectionModal } from './folderSelectionModal.js';
 import { SaveImageModal } from './saveImageModal.js';
 import { SelectPixelBannerModal } from './selectPixelBannerModal';
@@ -369,18 +368,6 @@ export class ImageSelectionModal extends Modal {
         const controlsRow = searchContainer.createDiv({ cls: 'controls-row' });
 
         // Generate with AI button
-        if (this.plugin.pixelBannerPlusEnabled && this.plugin.pixelBannerPlusServerOnline) {
-            const pixelBannerPlusGenAIButton = controlsRow.createEl('button');
-            pixelBannerPlusGenAIButton.addClass('radial-pulse-animation');
-            const sparkleSpan = pixelBannerPlusGenAIButton.createSpan({ cls: 'pixel-banner-twinkle-animation', text: '✨ ' });
-            pixelBannerPlusGenAIButton.createSpan({ cls:'margin-left-5', text: 'AI' });
-            pixelBannerPlusGenAIButton.addEventListener('click', () => {
-                this.close();
-                new GenerateAIBannerModal(this.app, this.plugin).open();
-            });
-        }
-
-        // Upload button
         const uploadButton = controlsRow.createEl('button', {
             text: '📤 Upload'
         });

@@ -3,12 +3,8 @@ import { createAPISettings } from './tabs/settingsTabAPISettings';
 import { createFolderSettings } from './tabs/settingsTabFolderImages';
 import { createCustomFieldsSettings } from './tabs/settingsTabCustomFieldNames';
 import { createGeneralSettings } from './tabs/settingsTabGeneral';
-import { createPixelBannerPlusSettings } from './tabs/settingsTabPixelBannerPlus';
 
 const DEFAULT_SETTINGS = {
-    pixelBannerPlusEmail: '',
-    pixelBannerPlusApiKey: '',
-    pixelBannerPlusEnabled: true,
     apiProvider: 'all',
     pexelsApiKey: '',
     pixabayApiKey: '',
@@ -95,7 +91,6 @@ const DEFAULT_SETTINGS = {
     bannerIconVerticalOffset: '0',
     bannerIconImageAlignment: 'left',
     openTargetingModalAfterSelectingBannerOrIcon: true,
-    enableDailyGame: false,
 };
 
 class FolderSuggestModal extends FuzzySuggestModal {
@@ -135,7 +130,6 @@ class PixelBannerSettingTab extends PluginSettingTab {
         // Create tabs in the desired order
         const { tabsEl, tabContentContainer } = this.createTabs(mainContent, [
             '⚙️ General',
-            '✨ Plus',
             '🗺️ Custom Fields',
             '🗃️ Folder Groups',
             '🌐 3rd Party APIs'
@@ -144,10 +138,6 @@ class PixelBannerSettingTab extends PluginSettingTab {
         // General tab content
         const generalTab = tabContentContainer.createEl('div', { cls: 'tab-content', attr: { 'data-tab': '⚙️ General' } });
         createGeneralSettings(generalTab, this.plugin);
-
-        // Pixel Banner Plus tab content
-        const pixelBannerPlusTab = tabContentContainer.createEl('div', { cls: 'tab-content', attr: { 'data-tab': '✨ Plus' } });
-        createPixelBannerPlusSettings(pixelBannerPlusTab, this.plugin);
 
         // Custom Fields tab content
         const customFieldsTab = tabContentContainer.createEl('div', { cls: 'tab-content', attr: { 'data-tab': '🗺️ Custom Fields' } });

@@ -1,13 +1,12 @@
 import { Plugin, MarkdownView, Notice, Platform } from 'obsidian';
 import { releaseNotes } from 'virtual:release-notes';
 import { DEFAULT_SETTINGS, PixelBannerSettingTab, debounce } from '../settings/settings.js';
-import { ReleaseNotesModal, TargetPositionModal, GenerateAIBannerModal, PixelBannerStoreModal, DailyGameModal } from '../modal/modals.js';
+import { ReleaseNotesModal, TargetPositionModal } from '../modal/modals.js';
 import { handlePinIconClick } from '../utils/handlePinIconClick.js';
 import { loadSettings, saveSettings } from './settings.js';
 import { getIconOverlay, returnIconOverlay, shouldUpdateIconOverlay, handleSetBannerIcon, handleSetBannerIconImage, cleanupIconOverlay } from './bannerIconHelpers.js'; 
 import { generateCacheKey, getCacheEntriesForFile, cleanupCache, invalidateLeafCache } from './cacheHelpers.js';
 import { fetchPexelsImage, fetchPixabayImage, fetchFlickrImage, fetchUnsplashImage } from '../services/apiService.js';
-import { verifyPixelBannerPlusCredentials, getPixelBannerInfo } from '../services/apiPIxelBannerPlus.js';
 import { addPixelBanner, updateBanner, applyBannerSettings, applyContentStartPosition, applyBannerWidth, updateAllBanners, updateBannerPosition, registerMarkdownPostProcessor } from './bannerManager.js';
 import { getInputType, getIconImageInputType, getPathFromObsidianLink, getPathFromMarkdownImage, getVaultImageUrl, preloadImage, getFolderPath, getFolderSpecificImage, getFolderSpecificSetting, getRandomImageFromFolder, getActiveApiProvider, hasBannerFrontmatter, createFolderImageSettings } from './bannerUtils.js';
 import { handleActiveLeafChange, handleLayoutChange, handleModeChange, handleSelectImage, handleBannerIconClick } from './eventHandler.js';
@@ -113,11 +112,6 @@ export class PixelBannerPlugin extends Plugin {
     async onload() {
         await this.loadSettings();
         
-        // Initialize Pixel Banner Plus state
-        this.pixelBannerPlusEnabled = false;
-        this.pixelBannerPlusBannerTokens = 0;
-        this.verifyPixelBannerPlusCredentials();
-        
         // hide embedded note titles
         this.updateEmbeddedTitlesVisibility();
         
@@ -127,25 +121,10 @@ export class PixelBannerPlugin extends Plugin {
         this.addSettingTab(new PixelBannerSettingTab(this.app, this));
         
         // Add commands
-        this.addCommand({
-            id: 'generate-banner-with-ai',
-            name: '✨ Generate Banner with AI',
-            checkCallback: (checking) => {
-                if (checking) {
-                    return this.pixelBannerPlusEnabled;
-                }
-                new GenerateAIBannerModal(this.app, this).open();
-            }
-        });
+
 
         // Add daily game command
-        this.addCommand({
-            id: 'play-daily-game',
-            name: '🕹️ Play Daily Game',
-            callback: () => {
-                new DailyGameModal(this.app, this.settings.pixelBannerPlusEmail, this.settings.pixelBannerPlusApiKey, this).open();
-            }
-        });
+
 
         // Register event handlers
         this.registerEvent(
@@ -394,11 +373,7 @@ export class PixelBannerPlugin extends Plugin {
         });
 
         // Add command for opening the banner store
-        this.addCommand({
-            id: 'open-banner-store',
-            name: '🏪 Open Pixel Banner Plus Collection',
-            callback: () => this.openBannerStore()
-        });
+
 
         // Add command for setting banner icon image
         this.addCommand({
@@ -1005,47 +980,5 @@ export class PixelBannerPlugin extends Plugin {
 
 
     // ------------------------------------------
-    // -- verify pixel banner plus credentials --
-    // ------------------------------------------
-    async verifyPixelBannerPlusCredentials() {
-        if (this.settings.pixelBannerPlusEnabled) {
-            const result = await verifyPixelBannerPlusCredentials(this);
-            // console.log('🔍 verifyPixelBannerPlusCredentials result:', result);
-            this.pixelBannerPlusServerOnline = result.serverOnline;
-            this.pixelBannerPlusEnabled = result.verified;
-            this.pixelBannerPlusBannerTokens = result.bannerTokens;
-            this.pixelBannerPlusJackpot = result.jackpot;
-            this.pixelBannerPlusDailyGameName = result.dailyGameName;
-            this.pixelBannerPlusHighScore = result.highScore || '0';
-            this.pixelBannerPlusTopUser = result.topUser;
-            this.pixelBannerPlusTimeLeft = result.timeLeft;
-            return result;
-        }
-        return {
-            serverOnline: false,
-            verified: false,
-            bannerTokens: 0,
-            jackpot: 0,
-            dailyGameName: '',
-            highScore: '0',
-            topUser: '',
-            timeLeft: 0
-        };
-    }
 
-    // -------------------------------- //
-    // -- get pixel banner plus info -- //
-    // -------------------------------- //
-    async getPixelBannerInfo() {
-        const result = await getPixelBannerInfo(this);
-        this.pixelBannerVersion = result.version;
-        return result;
-    }
-
-    // --------------------------
-    // -- open the banner store --
-    // --------------------------
-    openBannerStore() {
-        new PixelBannerStoreModal(this.app, this).open();
-    }
 }
