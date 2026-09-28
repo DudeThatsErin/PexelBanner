@@ -1608,7 +1608,8 @@ function applyContentStartPosition(plugin, el, contentStartPosition) {
         return;
     }
     const numericContentStart = Number(contentStartPosition);
-    const contentStartCss = `${Number.isFinite(numericContentStart) ? numericContentStart : 355}px`;
+    const resolvedContentStart = Number.isFinite(numericContentStart) ? numericContentStart : 355;
+    const contentStartCss = `${resolvedContentStart}px`;
     el.style.setProperty('--pixel-banner-content-start', contentStartCss);
 
     // Obsidian desktop gives plugins a .view-content root, while iPhone can
@@ -1622,8 +1623,32 @@ function applyContentStartPosition(plugin, el, contentStartPosition) {
             ? el.querySelector('.markdown-preview-sizer')
             : null);
 
-    sourceSizer?.style.setProperty('padding-top', contentStartCss, 'important');
-    previewSizer?.style.setProperty('padding-top', contentStartCss, 'important');
+    const applySizerPadding = (sizer) => {
+        if (!sizer) return;
+
+        let padding = resolvedContentStart;
+        const banner = (viewRoot || el).querySelector('.pixel-banner-image');
+        if (banner && typeof banner.getBoundingClientRect === 'function') {
+            // iPhone places the note sizer below the floating mobile header while
+            // the banner begins behind it. Compensate for that real offset so
+            // content-start is measured from the banner rather than the sizer.
+            const bannerTop = banner.getBoundingClientRect().top;
+            const sizerTop = sizer.getBoundingClientRect().top;
+            padding = Math.max(0, resolvedContentStart - Math.max(0, sizerTop - bannerTop));
+        }
+        sizer.style.setProperty('padding-top', `${padding}px`, 'important');
+    };
+
+    applySizerPadding(sourceSizer);
+    applySizerPadding(previewSizer);
+
+    // The mobile header completes its layout after Obsidian renders the note.
+    // Recalculate on the next frame to avoid using its initial zero-height state.
+    const afterLayout = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : setTimeout;
+    afterLayout(() => {
+        applySizerPadding(sourceSizer);
+        applySizerPadding(previewSizer);
+    });
 }
 
 
