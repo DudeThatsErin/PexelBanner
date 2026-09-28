@@ -653,6 +653,15 @@
     transform: scale(1.2);
 }
 
+/* iPhone renders a banner behind the status area. Keep Pixel Banner's controls
+   inside the safe, tappable region instead of beneath the clock and notch. */
+body.is-phone .select-image-icon,
+body.is-phone .pin-icon,
+body.is-phone .refresh-icon,
+body.is-phone .view-image-icon {
+    top: calc(env(safe-area-inset-top) + 12px) !important;
+}
+
 /* ------------------------- */
 /* -- banner icon overlay -- */
 /* ------------------------- */
