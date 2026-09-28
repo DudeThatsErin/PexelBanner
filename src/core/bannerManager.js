@@ -1511,9 +1511,12 @@ function applyBannerSettings(plugin, bannerDiv, ctx, isEmbedded) {
         alignmentValue = '0 0 0 auto';
     }
 
+    const effectiveBannerHeight = hideEmbeddedNoteBanners && isEmbedded ? 0 : Number(bannerHeight);
+    const bannerHeightCss = `${Number.isFinite(effectiveBannerHeight) ? effectiveBannerHeight : 350}px`;
+
     // Create a CSS variables object to ensure consistent application
     const cssVars = {
-        '--pixel-banner-height': hideEmbeddedNoteBanners && isEmbedded ? '0px' : `${bannerHeight}px`,
+        '--pixel-banner-height': bannerHeightCss,
         '--pixel-banner-fade': `${fade}%`,
         '--pixel-banner-fade-in-animation-duration': `${plugin.settings.bannerFadeInAnimationDuration}ms`,
         '--pixel-banner-radius': `${borderRadius}px`,
@@ -1540,6 +1543,13 @@ function applyBannerSettings(plugin, bannerDiv, ctx, isEmbedded) {
             '0px',
         '--pixel-banner-alignment': alignmentValue
     };
+
+    // Obsidian mobile and some themes apply their own image height rules.  Set
+    // all three constraints inline so a frontmatter value has the same final
+    // CSS-pixel height on every device.
+    bannerDiv.style.setProperty('height', bannerHeightCss, 'important');
+    bannerDiv.style.setProperty('min-height', bannerHeightCss, 'important');
+    bannerDiv.style.setProperty('max-height', bannerHeightCss, 'important');
 
     // Apply style properties to the banner div
     bannerDiv.style.backgroundSize = imageDisplay || 'cover';
