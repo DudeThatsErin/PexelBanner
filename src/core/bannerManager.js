@@ -43,13 +43,13 @@ async function addPixelBanner(plugin, el, ctx) {
         // set padding-top for source & preview elements as inline style for FAST rendering!
         const sourceEl = viewContent.querySelector(':scope > .markdown-source-view .cm-sizer');
         if (sourceEl) {
-            sourceEl.style.paddingTop = 'var(--pixel-banner-content-start, 355px)';
+            sourceEl.style.setProperty('padding-top', `${initialContentStart}px`, 'important');
             sourceEl.style.paddingBottom = '0px !important';
         }
 
         const previewEl = viewContent.querySelector(':scope > .markdown-reading-view .markdown-preview-sizer');
         if (previewEl) {
-            previewEl.style.paddingTop = 'var(--pixel-banner-content-start, 355px)';
+            previewEl.style.setProperty('padding-top', `${initialContentStart}px`, 'important');
             previewEl.style.paddingBottom = '0px !important';
         }
 
@@ -1607,7 +1607,19 @@ function applyContentStartPosition(plugin, el, contentStartPosition) {
     if (!el) {
         return;
     }
-    el.style.setProperty('--pixel-banner-content-start', `${contentStartPosition}px`);
+    const numericContentStart = Number(contentStartPosition);
+    const contentStartCss = `${Number.isFinite(numericContentStart) ? numericContentStart : 355}px`;
+    el.style.setProperty('--pixel-banner-content-start', contentStartCss);
+
+    // On mobile, Obsidian can retain the initial fallback padding (355px) on a
+    // newly opened note even after the CSS variable changes. Apply the resolved
+    // note value directly to both render modes so content-start: 140 is 140px.
+    if (el.classList.contains('view-content')) {
+        const sourceSizer = el.querySelector(':scope > .markdown-source-view .cm-sizer');
+        const previewSizer = el.querySelector(':scope > .markdown-reading-view .markdown-preview-sizer');
+        sourceSizer?.style.setProperty('padding-top', contentStartCss, 'important');
+        previewSizer?.style.setProperty('padding-top', contentStartCss, 'important');
+    }
 }
 
 
