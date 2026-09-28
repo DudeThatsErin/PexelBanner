@@ -1611,15 +1611,19 @@ function applyContentStartPosition(plugin, el, contentStartPosition) {
     const contentStartCss = `${Number.isFinite(numericContentStart) ? numericContentStart : 355}px`;
     el.style.setProperty('--pixel-banner-content-start', contentStartCss);
 
-    // On mobile, Obsidian can retain the initial fallback padding (355px) on a
-    // newly opened note even after the CSS variable changes. Apply the resolved
-    // note value directly to both render modes so content-start: 140 is 140px.
-    if (el.classList.contains('view-content')) {
-        const sourceSizer = el.querySelector(':scope > .markdown-source-view .cm-sizer');
-        const previewSizer = el.querySelector(':scope > .markdown-reading-view .markdown-preview-sizer');
-        sourceSizer?.style.setProperty('padding-top', contentStartCss, 'important');
-        previewSizer?.style.setProperty('padding-top', contentStartCss, 'important');
-    }
+    // Obsidian desktop gives plugins a .view-content root, while iPhone can
+    // provide the reading/live-preview element itself. Resolve both shapes and
+    // update only the top-level note sizers (never embedded notes).
+    const viewRoot = el.classList.contains('view-content') ? el : el.closest('.view-content');
+    const sourceSizer = viewRoot?.querySelector(':scope > .markdown-source-view .cm-sizer') ||
+        (el.classList.contains('markdown-source-view') ? el.querySelector('.cm-sizer') : null);
+    const previewSizer = viewRoot?.querySelector(':scope > .markdown-reading-view .markdown-preview-sizer') ||
+        (el.classList.contains('markdown-reading-view') || el.classList.contains('markdown-preview-view')
+            ? el.querySelector('.markdown-preview-sizer')
+            : null);
+
+    sourceSizer?.style.setProperty('padding-top', contentStartCss, 'important');
+    previewSizer?.style.setProperty('padding-top', contentStartCss, 'important');
 }
 
 
