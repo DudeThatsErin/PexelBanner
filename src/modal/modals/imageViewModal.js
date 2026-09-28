@@ -85,11 +85,6 @@ export class ImageViewModal extends Modal {
         // Add keyboard listener for Escape key
         this.scope.register([], 'Escape', () => this.close());
 
-        // Set initial position of the modal
-        const modalEl = this.modalEl;
-        modalEl.style.position = 'absolute';
-        modalEl.style.left = `${modalEl.getBoundingClientRect().left}px`;
-        modalEl.style.top = `${modalEl.getBoundingClientRect().top}px`;
     }
 
     addStyles() {
@@ -113,6 +108,7 @@ export class ImageViewModal extends Modal {
                 top: 50% !important;
                 left: 50% !important;
                 transform: translate(-50%, -50%);
+                position: fixed !important;
             }
 
             .pixel-banner-image-view-modal {

@@ -137,6 +137,17 @@ export class PixelBannerPlugin extends Plugin {
             this.app.workspace.on('resize', this.debouncedEnsureBanner.bind(this))
         );
 
+        // Homepage and restored linked panes can exist before their Markdown view
+        // has finished laying out.  Refresh every open note once the workspace is
+        // ready so their banner uses the final dimensions (#333, #334, #207).
+        const refreshOpenBanners = () => window.setTimeout(() => this.updateAllBanners(), 150);
+        if (typeof this.app.workspace.onLayoutReady === 'function') {
+            this.app.workspace.onLayoutReady(refreshOpenBanners);
+        } else {
+            // Compatibility with older Obsidian builds and minimal test hosts.
+            refreshOpenBanners();
+        }
+
         // Add metadata cache event listener for frontmatter changes
         this.registerEvent(
             this.app.metadataCache.on('changed', async (file) => {

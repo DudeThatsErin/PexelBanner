@@ -144,6 +144,8 @@ describe('bannerUtils', () => {
         it('should detect markdown image input type', () => {
             expect(getInputType.call(testContext, '![](image.jpg)')).toBe('markdownImage');
             expect(getInputType.call(testContext, '"![](image.jpg)"')).toBe('markdownImage');
+            expect(getInputType.call(testContext, '[Banner](image.jpg)')).toBe('markdownImage');
+            expect(getInputType.call(testContext, '![Banner](image.jpg)')).toBe('markdownImage');
         });
 
         it('should detect file URL input type', () => {
@@ -359,6 +361,11 @@ describe('bannerUtils', () => {
     describe('getPathFromMarkdownImage', () => {
         it('should extract URL from markdown image syntax', () => {
             const result = getPathFromMarkdownImage.call(testContext, '![](https://example.com/image.jpg)');
+            expect(result).toBe('https://example.com/image.jpg');
+        });
+
+        it('should extract URL from an ordinary markdown link', () => {
+            const result = getPathFromMarkdownImage.call(testContext, '[Banner](https://example.com/image.jpg)');
             expect(result).toBe('https://example.com/image.jpg');
         });
 

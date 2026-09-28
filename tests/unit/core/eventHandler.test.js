@@ -250,7 +250,7 @@ describe('eventHandler', () => {
             expect(mockPlugin.updateBanner).toHaveBeenCalledTimes(1);
         });
 
-        it('should clean up previous leaf when switching', async () => {
+        it('should keep the previous leaf intact when switching linked panes', async () => {
             const previousLeaf = {
                 id: 'previous-leaf',
                 view: new MarkdownView()
@@ -265,8 +265,8 @@ describe('eventHandler', () => {
             vi.advanceTimersByTime(350);
             await promise;
 
-            expect(mockPlugin.cleanupPreviousLeaf).toHaveBeenCalledWith(previousLeaf);
-            expect(mockPlugin.cleanupIconOverlay).toHaveBeenCalledWith(previousLeaf.view);
+            expect(mockPlugin.cleanupPreviousLeaf).not.toHaveBeenCalled();
+            expect(mockPlugin.cleanupIconOverlay).not.toHaveBeenCalledWith(previousLeaf.view);
         });
 
         it('should clean up icon overlay when no banner icon in frontmatter', async () => {

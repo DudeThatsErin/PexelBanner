@@ -112,18 +112,9 @@ export async function updateNoteFrontmatter(imagePath, plugin, usedField = null)
 
     // Use Obsidian's processFrontMatter API to properly update frontmatter
     await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-        // Only remove old banner fields that are different from the one being set
-        // This prevents unintended property modifications on mobile devices
-        if (Array.isArray(plugin.settings.customBannerField)) {
-            for (const field of plugin.settings.customBannerField) {
-                // Only delete if it's a different field than the one we're setting
-                if (field !== bannerField && field in frontmatter) {
-                    delete frontmatter[field];
-                }
-            }
-        }
-        
-        // Set the new banner field
+        // Custom banner fields are aliases, not disposable properties.  Deleting
+        // them rewrites unrelated frontmatter and can corrupt Obsidian's property
+        // type metadata (#289).
         frontmatter[bannerField] = bannerValue;
     });
 
@@ -144,18 +135,7 @@ export async function updateNoteFrontmatterWithUrl(imageUrl, plugin, usedField =
 
     // Use Obsidian's processFrontMatter API to properly update frontmatter
     await plugin.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
-        // Only remove old banner fields that are different from the one being set
-        // This prevents unintended property modifications on mobile devices
-        if (Array.isArray(plugin.settings.customBannerField)) {
-            for (const field of plugin.settings.customBannerField) {
-                // Only delete if it's a different field than the one we're setting
-                if (field !== bannerField && field in frontmatter) {
-                    delete frontmatter[field];
-                }
-            }
-        }
-        
-        // Set the new banner field with the URL
+        // Preserve all other frontmatter, including alternate banner fields.
         frontmatter[bannerField] = imageUrl;
     });
 

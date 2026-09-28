@@ -17,24 +17,19 @@ async function handleActiveLeafChange(leaf) {
     const filePath = leaf.view.file.path;
     const debounceCheckTime = Date.now();
     
-    // Check if we recently updated this file's banner
-    const lastUpdateTime = bannerUpdateDebounceMap.get(filePath);
-    if (lastUpdateTime && (debounceCheckTime - lastUpdateTime) < BANNER_UPDATE_DEBOUNCE_DELAY) {
+    // Debounce by leaf rather than file.  The same note may be open in linked
+    // panes and each pane needs its own initial render.
+    const debounceKey = `${filePath}-${leaf.id}`;
+    const lastLeafUpdateTime = bannerUpdateDebounceMap.get(debounceKey);
+    if (lastLeafUpdateTime && (debounceCheckTime - lastLeafUpdateTime) < BANNER_UPDATE_DEBOUNCE_DELAY) {
         return;
     }
-    
-    // Update the debounce timestamp
-    bannerUpdateDebounceMap.set(filePath, debounceCheckTime);
+    bannerUpdateDebounceMap.set(debounceKey, debounceCheckTime);
     
     this.cleanupCache();
 
-    // Clean up previous leaf and its icon overlay
-    const previousLeaf = this.app.workspace.activeLeaf;
-    if (previousLeaf && previousLeaf.view instanceof MarkdownView && previousLeaf !== leaf) {
-        this.cleanupPreviousLeaf(previousLeaf);
-        // Use the plugin's bound method
-        this.cleanupIconOverlay(previousLeaf.view);
-    }
+    // Do not clear the previously active leaf here. Linked and split tabs remain
+    // visible when focus moves, so removing their banner makes them appear broken.
 
     const currentPath = leaf.view.file.path;
     const leafId = leaf.id;

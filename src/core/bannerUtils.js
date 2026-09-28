@@ -24,8 +24,9 @@ function getInputType(input, sourcePath = '') {
         return 'obsidianLink';
     }
 
-    // Check if it's a Markdown image syntax (![](path.jpg) format)
-    if (input.match(/^!\[\]\(.*\)$/) || input.match(/^"?!\[\]\(.*\)"?$/)) {
+    // Support both Markdown images and ordinary Markdown links.  Obsidian writes
+    // the latter when "Use [[Wikilinks]]" is disabled.
+    if (/^!?\[[^\]]*\]\(.+\)$/.test(cleanedInput)) {
         return 'markdownImage';
     }
 
@@ -78,8 +79,8 @@ function getPathFromMarkdownImage(link) {
     // Remove surrounding quotes if they exist
     let cleanLink = link.replace(/^["'](.*)["']$/, '$1');
     
-    // Extract the URL from the Markdown image syntax ![](url)
-    const match = cleanLink.match(/^!\[\]\((.*)\)$/);
+    // Extract the target from either ![alt](target) or [title](target).
+    const match = cleanLink.match(/^!?\[[^\]]*\]\((.+)\)$/);
     if (match && match[1]) {
         const path = match[1];
         

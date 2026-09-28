@@ -352,7 +352,7 @@ describe('frontmatterUtils', () => {
             expect(frontmatter.cover).toBe('![[images/banner.jpg]]');
         });
 
-        it('should clean existing banner fields before adding new one', async () => {
+        it('should preserve alternate banner fields when adding a new one', async () => {
             const activeFile = new TFile('test.md');
             mockApp.workspace.getActiveFile.mockReturnValue(activeFile);
             
@@ -360,13 +360,13 @@ describe('frontmatterUtils', () => {
             
             expect(mockApp.fileManager.processFrontMatter).toHaveBeenCalled();
             
-            // Verify old banner fields are cleaned
+            // Verify alternate fields are preserved
             const callback = mockApp.fileManager.processFrontMatter.mock.calls[0][1];
             const frontmatter = { title: 'Test', banner: 'old.jpg', image: 'another.jpg' };
             callback(frontmatter);
             
             expect(frontmatter.banner).toBe('![[new.jpg]]');
-            expect(frontmatter.image).toBeUndefined(); // 'image' field removed as it's in customBannerField
+            expect(frontmatter.image).toBe('another.jpg');
             expect(frontmatter.title).toBe('Test'); // Other fields preserved
         });
 
@@ -499,7 +499,7 @@ describe('frontmatterUtils', () => {
             expect(frontmatter.cover).toBe('https://example.com/image.jpg');
         });
 
-        it('should clean existing banner fields before adding URL', async () => {
+        it('should preserve alternate banner fields when adding a URL', async () => {
             const activeFile = new TFile('test.md');
             mockApp.workspace.getActiveFile.mockReturnValue(activeFile);
             
@@ -507,13 +507,13 @@ describe('frontmatterUtils', () => {
             
             expect(mockApp.fileManager.processFrontMatter).toHaveBeenCalled();
             
-            // Verify old banner fields are cleaned
+            // Verify alternate fields are preserved
             const callback = mockApp.fileManager.processFrontMatter.mock.calls[0][1];
             const frontmatter = { title: 'Test', banner: 'old.jpg', image: 'another.jpg' };
             callback(frontmatter);
             
             expect(frontmatter.banner).toBe('https://example.com/new.jpg');
-            expect(frontmatter.image).toBeUndefined(); // 'image' field removed as it's in customBannerField
+            expect(frontmatter.image).toBe('another.jpg');
             expect(frontmatter.title).toBe('Test'); // Other fields preserved
         });
 
@@ -580,7 +580,7 @@ describe('frontmatterUtils', () => {
             callback(frontmatter);
             
             expect(frontmatter.banner).toBe('https://example.com/new-banner.jpg');
-            expect(frontmatter.image).toBeUndefined(); // Cleaned as it's in customBannerField
+            expect(frontmatter.image).toBe('another-image.jpg');
             expect(frontmatter.title).toBe('Complex Note');
             expect(frontmatter.tags).toEqual(['test', 'note']);
             expect(frontmatter.metadata).toEqual({
