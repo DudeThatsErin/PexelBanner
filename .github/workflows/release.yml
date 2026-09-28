@@ -34,7 +34,8 @@ jobs:
         env:
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          test "$RELEASE_TAG" = "v$(node -p \"require('./manifest.json').version\")"
+          VERSION=$(node -p "require('./manifest.json').version")
+          test "$RELEASE_TAG" = "v$VERSION"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
