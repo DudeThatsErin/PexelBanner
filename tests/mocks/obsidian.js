@@ -1,5 +1,10 @@
 import { vi } from 'vitest';
 
+export const getIconIds = () => ['airplay', 'anchor', 'camera', 'heart'];
+export const setIcon = (el, iconName) => {
+  el.dataset.icon = iconName;
+};
+
 // Mock Obsidian API classes and functions
 export class Plugin {
   constructor(app, manifest) {

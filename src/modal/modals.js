@@ -5,6 +5,7 @@ export { ReleaseNotesModal } from './modals/releaseNotesModal.js';
 export { ImageViewModal } from './modals/imageViewModal.js';
 export { ImageSelectionModal } from './modals/imageSelectionModal.js'
 export { IconImageSelectionModal } from './modals/iconImageSelectionModal.js'
+export { LucideIconSelectionModal } from './modals/lucideIconSelectionModal.js'
 export { FolderSelectionModal } from './modals/folderSelectionModal.js';
 export { IconFolderSelectionModal } from './modals/iconFolderSelectionModal.js';
 export { SaveImageModal } from './modals/saveImageModal.js'

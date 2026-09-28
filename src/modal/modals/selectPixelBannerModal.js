@@ -1,7 +1,7 @@
 import { Modal, MarkdownView, Setting } from 'obsidian';
 import {
     ImageSelectionModal, EmojiSelectionModal, TargetPositionModal, WebAddressModal,
-    IconImageSelectionModal
+    IconImageSelectionModal, LucideIconSelectionModal
 } from '../modals';
 import { flags } from '../../resources/flags.js';
 import { semver } from '../../utils/semver.js';
@@ -329,6 +329,39 @@ export class SelectPixelBannerModal extends Modal {
                 onChooseBannerIconImage,
                 this.plugin.settings.defaultSelectIconPath
             ).open();
+        });
+
+        // Lucide Icon Button
+        const lucideIconButton = customizationOptions.createEl('button', {
+            cls: 'pixel-banner-customize-button'
+        });
+        const lucideIconContent = lucideIconButton.createDiv({ cls: 'pixel-banner-button-content' });
+        lucideIconContent.createEl('span', { text: '◈', cls: 'pixel-banner-button-icon' });
+        lucideIconContent.createEl('div', { cls: 'pixel-banner-button-text-container' }).createEl('span', {
+            text: 'Lucide Icon',
+            cls: 'pixel-banner-button-text'
+        });
+        if (!hasBanner) {
+            lucideIconButton.disabled = true;
+            lucideIconButton.classList.add('pixel-banner-button-disabled');
+            lucideIconButton.title = 'You need to add a banner first';
+        }
+        lucideIconButton.addEventListener('click', () => {
+            if (!hasBanner) return;
+            this.close();
+            new LucideIconSelectionModal(this.app, async (iconName) => {
+                const activeFile = this.app.workspace.getActiveFile();
+                if (!activeFile) return;
+                const field = this.plugin.settings.customBannerLucideIconField[0].split(',')[0].trim();
+                await this.app.fileManager.processFrontMatter(activeFile, (frontmatter) => {
+                    frontmatter[field] = iconName;
+                });
+                const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+                if (view) await this.plugin.updateBanner(view, true);
+                if (this.plugin.settings.openTargetingModalAfterSelectingBannerOrIcon) {
+                    new TargetPositionModal(this.app, this.plugin).open();
+                }
+            }).open();
         });
 
         // Banner Icon Button
@@ -694,4 +727,4 @@ export class SelectPixelBannerModal extends Modal {
             this.style.remove();
         }
     }
-} 
+}

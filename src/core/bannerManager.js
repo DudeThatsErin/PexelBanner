@@ -1,4 +1,4 @@
-import { MarkdownView, Notice } from 'obsidian';
+import { MarkdownView, Notice, setIcon } from 'obsidian';
 import { ImageViewModal, TargetPositionModal } from '../modal/modals.js';
 import { getFrontmatterValue, getValueWithZeroCheck } from '../utils/frontmatterUtils.js';
 import { handlePinIconClick } from '../utils/handlePinIconClick.js';
@@ -1083,9 +1083,12 @@ async function updateBanner(plugin, view, isContentChange, updateMode = plugin.U
         });
     }
 
-    // Clean up existing persistent banner icon overlays if both icon and icon-image fields are removed or empty
+    const bannerLucideIcon = getFrontmatterValue(frontmatter, plugin.settings.customBannerLucideIconField);
+
+    // Clean up existing persistent banner icon overlays if all icon fields are removed or empty.
     if ((!bannerIcon || (typeof bannerIcon === 'string' && !bannerIcon.trim())) &&
-        (!bannerIconImage || (typeof bannerIconImage === 'string' && !bannerIconImage.trim()))) {
+        (!bannerIconImage || (typeof bannerIconImage === 'string' && !bannerIconImage.trim())) &&
+        (!bannerLucideIcon || (typeof bannerLucideIcon === 'string' && !bannerLucideIcon.trim()))) {
         // For embedded notes
         if (isEmbedded) {
             const embedContainer = contentEl.querySelector('.markdown-preview-sizer') ||
@@ -1119,9 +1122,10 @@ async function updateBanner(plugin, view, isContentChange, updateMode = plugin.U
         }
     }
 
-    // Proceed if we have a valid banner icon or banner icon image
+    // Proceed if we have a valid text, image, or Lucide icon.
     if ((bannerIcon && typeof bannerIcon === 'string' && bannerIcon.trim()) ||
-        (bannerIconImage && typeof bannerIconImage === 'string' && bannerIconImage.trim())) {
+        (bannerIconImage && typeof bannerIconImage === 'string' && bannerIconImage.trim()) ||
+        (bannerLucideIcon && typeof bannerLucideIcon === 'string' && bannerLucideIcon.trim())) {
         const cleanIcon = bannerIcon ? bannerIcon.trim() : '';
 
         // Check cache first
@@ -1297,6 +1301,13 @@ async function updateBanner(plugin, view, isContentChange, updateMode = plugin.U
                 } // End of else block for valid inputType
             }
 
+            let lucideElement = null;
+            if (typeof bannerLucideIcon === 'string' && bannerLucideIcon.trim()) {
+                lucideElement = document.createElement('span');
+                lucideElement.className = 'banner-icon-lucide';
+                setIcon(lucideElement, bannerLucideIcon.trim());
+            }
+
             // Create text element if we have icon text
             let textElement = null;
             if (cleanIcon) {
@@ -1310,9 +1321,11 @@ async function updateBanner(plugin, view, isContentChange, updateMode = plugin.U
                 // Add text first, then image
                 if (textElement) bannerIconOverlay.appendChild(textElement);
                 if (imgElement) bannerIconOverlay.appendChild(imgElement);
+                if (lucideElement) bannerIconOverlay.appendChild(lucideElement);
             } else {
                 // Default alignment: image first, then text
                 if (imgElement) bannerIconOverlay.appendChild(imgElement);
+                if (lucideElement) bannerIconOverlay.appendChild(lucideElement);
                 if (textElement) bannerIconOverlay.appendChild(textElement);
             }
 

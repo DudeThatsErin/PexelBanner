@@ -31,6 +31,7 @@ const DEFAULT_SETTINGS = {
     customBannerShuffleField: ['banner-shuffle'],
     customBannerIconField: ['icon'],
     customBannerIconImageField: ['icon-image'],
+    customBannerLucideIconField: ['icon-lucide'],
     customBannerIconSizeField: ['icon-size'],
     customBannerIconImageSizeMultiplierField: ['icon-image-size-multiplier'],
     customBannerIconTextVerticalOffsetField: ['icon-text-vertical-offset'],

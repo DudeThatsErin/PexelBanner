@@ -66,6 +66,24 @@
     transition: background-position 0.5s ease;
 }
 
+.banner-icon-lucide,
+.pixel-banner-lucide-preview {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-icon-lucide svg {
+    width: 1em;
+    height: 1em;
+    stroke-width: 2;
+}
+
+.pixel-banner-lucide-preview {
+    width: 1.5em;
+    margin-right: 0.5em;
+}
+
 .pixel-banner-video {
     object-fit: cover;
     object-position: var(--pixel-banner-x-position, 50%) var(--pixel-banner-y-position, 50%) !important;
