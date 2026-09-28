@@ -51,28 +51,6 @@ var init_flags = __esm({
   }
 });
 
-// src/utils/semver.js
-var semver;
-var init_semver = __esm({
-  "src/utils/semver.js"() {
-    semver = {
-      parse: (versionString) => {
-        const [major, minor, patch] = versionString.split(".").map(Number);
-        return { major, minor, patch };
-      },
-      gt: (v1, v2) => {
-        const ver1 = semver.parse(v1);
-        const ver2 = semver.parse(v2);
-        if (ver1.major > ver2.major) return true;
-        if (ver1.major < ver2.major) return false;
-        if (ver1.minor > ver2.minor) return true;
-        if (ver1.minor < ver2.minor) return false;
-        return ver1.patch > ver2.patch;
-      }
-    };
-  }
-});
-
 // src/modal/modals/releaseNotesModal.js
 var import_obsidian6, ReleaseNotesModal;
 var init_releaseNotesModal = __esm({
@@ -556,6 +534,12 @@ var init_saveImageModal = __esm({
         contentEl.empty();
       }
     };
+  }
+});
+
+// src/utils/semver.js
+var init_semver = __esm({
+  "src/utils/semver.js"() {
   }
 });
 
@@ -27490,79 +27474,9 @@ function createCustomFieldsSettings(containerEl, plugin) {
 // src/settings/tabs/settingsTabGeneral.js
 var import_obsidian4 = require("obsidian");
 init_flags();
-init_semver();
-function addUpdateButtonIfNeeded(containerEl, plugin, insertAfterCallout = false) {
-  if (!plugin.pixelBannerVersion) {
-    console.log("[Pixel Banner] No cloud version available, skipping update button");
-    return;
-  }
-  const cloudVersion = plugin.pixelBannerVersion;
-  const currentVersion = plugin.settings.lastVersion;
-  const isCloudVersionGreater = semver.gt(cloudVersion, currentVersion);
-  if (isCloudVersionGreater) {
-    if (containerEl.querySelector(".pixel-banner-update-button")) {
-      return;
-    }
-    const updateContainer = document.createElement("div");
-    updateContainer.style.cssText = `
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        `;
-    const updateButton = document.createElement("button");
-    updateButton.textContent = "\u{1F504} Update Available!";
-    updateButton.className = "pixel-banner-scale-up-down-animation pixel-banner-update-button";
-    updateButton.style.cssText = `
-            padding: 6px 12px;
-            background-color: var(--interactive-accent);
-            color: var(--text-on-accent);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-        `;
-    updateContainer.appendChild(updateButton);
-    const calloutEl = containerEl.querySelector(".tab-callout");
-    if (calloutEl && calloutEl.nextSibling) {
-      calloutEl.parentNode.insertBefore(updateContainer, calloutEl.nextSibling);
-    } else {
-      containerEl.appendChild(updateContainer);
-    }
-    updateButton.addEventListener("click", async () => {
-      await plugin.app.setting.open();
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const settingsTabs = document.querySelectorAll(".vertical-tab-header-group .vertical-tab-nav-item");
-      for (const tab of settingsTabs) {
-        if (tab.textContent.includes("Community plugins")) {
-          tab.click();
-          break;
-        }
-      }
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const allTheButtons = document.querySelectorAll("button.mod-cta");
-      for (const button of allTheButtons) {
-        if (button.textContent.includes("Check for updates")) {
-          button.click();
-          break;
-        }
-      }
-    });
-  }
-}
 function createGeneralSettings(containerEl, plugin) {
   const calloutEl = containerEl.createEl("div", { cls: "tab-callout margin-bottom-0" });
   calloutEl.createEl("div", { text: `v${plugin.settings.lastVersion} \u22C5 Configure default settings for all notes.` });
-  if (!plugin.pixelBannerVersion) {
-    plugin.getPixelBannerInfo().then(() => {
-      addUpdateButtonIfNeeded(containerEl, plugin);
-    }).catch((error) => {
-      console.log("[Pixel Banner] Failed to fetch version info:", error.message);
-    });
-  } else if (!plugin.pixelBannerVersion) {
-    console.log("[Pixel Banner] Version not available, skipping version check");
-  } else {
-    addUpdateButtonIfNeeded(containerEl, plugin);
-  }
   const SelectImageSettingsGroup = containerEl.createDiv({ cls: "setting-group" });
   const showSelectImageIconSetting = new import_obsidian4.Setting(SelectImageSettingsGroup).setName("Show Pixel Banner Flag").setDesc("Show the banner selector icon in the top-left corner of notes").addToggle((toggle) => toggle.setValue(plugin.settings.showSelectImageIcon).onChange(async (value) => {
     try {
